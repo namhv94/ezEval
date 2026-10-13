@@ -1,0 +1,25 @@
+[package]
+name = "ezeval"
+version = "0.1.0"
+edition = "2021"
+authors = ["EzLabs Core Team <contact@ezlabs.tech>"]
+description = "High-throughput boundary fuzzing, JSON Schema enforcement, and safety guardrails in Rust."
+license = "MIT"
+repository = "https://github.com/namhv94/ezEval"
+homepage = "https://ezlabs.tech"
+keywords = ["evals", "fuzzing", "guardrails", "json-schema", "safety"]
+
+[dependencies]
+clap = { version = "4.5", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+regex = "1.10"
+thiserror = "1.0"
+
+[[bin]]
+name = "ezeval"
+path = "src/main.rs"
+
+[lib]
+name = "ezeval"
+path = "src/lib.rs"

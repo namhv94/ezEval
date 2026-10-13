@@ -2,11 +2,11 @@
 
 # 🛡️ ezEval
 
-**High-Throughput Boundary Fuzzing, Strict JSON Schema Enforcement & Safety Guardrails**  
+**High-Throughput Boundary Fuzzing, Strict JSON Schema Enforcement & Safety Guardrails in Rust**  
 *Hardening AI agents and LLM tool calling against schema drift, boundary overflows, and safety violations.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
+[![Rust 1.80+](https://img.shields.io/badge/rust-1.80%2B-orange.svg)](https://www.rust-lang.org/)
 [![Safety Alignment](https://img.shields.io/badge/Safety-Anthropic%20Aligned-emerald.svg)](https://www.anthropic.com/)
 [![Product of EzLabs](https://img.shields.io/badge/Product%20of-EzLabs-0ea5e9.svg)](https://ezlabs.tech)
 
@@ -26,9 +26,9 @@ Autonomous AI systems fail catastrophically at boundary edges:
 
 ## ⚡ The Solution: ezEval
 
-**ezEval** is a high-speed, zero-dependency evaluation toolkit developed by **[EzLabs](https://ezlabs.tech)** to fuzz, validate, and guard AI agents:
+**ezEval** is a high-speed, zero-dependency evaluation toolkit developed in **Rust** by **[EzLabs](https://ezlabs.tech)** to fuzz, validate, and guard AI agents:
 * **Boundary Fuzzer**: Synthesizes adversarial mutations (Unicode RTL, zero-width spaces, integer bounds, recursive JSON depth).
-* **Strict JSON Schema Validator**: Detects missing fields, invalid ranges, and hallucinated keys in sub-millisecond time.
+* **Strict JSON Schema Validator**: Detects missing fields, invalid ranges, and hallucinated keys in sub-millisecond compiled time.
 * **Safety & PII Guardrails**: Pre-execution and post-generation scanning for tokens, API keys, credentials, and hazardous commands.
 
 ---
@@ -42,7 +42,7 @@ Autonomous AI systems fail catastrophically at boundary edges:
                              │
                              ▼
  ┌────────────────────────────────────────────────────────┐
- │            ezEval Fast Interception Engine             │
+ │         ezEval Rust Fast Interception Engine           │
  └───────────────────────────┬────────────────────────────┘
                              │
               ┌──────────────┴──────────────┐
@@ -67,100 +67,109 @@ Autonomous AI systems fail catastrophically at boundary edges:
 
 ## ✨ Key Features
 
-- **Strict Schema Enforcement**: Validates agent arguments against JSON Schema with zero dependencies. Catches subtle type coercion bugs and schema drift.
-- **Boundary & Adversarial Fuzzing**: Generates extreme numeric edges, null-byte payloads, RTL overrides, and nested recursion bombs.
-- **Realtime Safety Guardrails**: Realtime detection of API keys (OpenAI, AWS, GitHub), Bearer tokens, PII (emails, Vietnamese & international phones), and hazardous commands (`rm -rf`, pipe-to-shell, fork bombs).
-- **Sub-Millisecond Performance**: Pure Python engine evaluating hundreds of test cases per millisecond without heavy ML overhead.
+- **Blazing Fast Native Rust**: Sub-millisecond evaluation speed capable of validating tens of thousands of schemas per second.
+- **Strict Schema Enforcement**: Validates agent arguments against JSON Schema without external dependencies. Catches subtle type coercion bugs and schema drift.
+- **Boundary & Adversarial Fuzzing**: Generates extreme numeric edges (`i64::MIN`, `i64::MAX`), null-byte payloads, RTL overrides, and nested recursion bombs.
+- **Realtime Safety Guardrails**: Realtime detection of API keys (AWS, GitHub), Bearer tokens, PII (emails, Vietnamese & international phones), and hazardous commands (`rm -rf`, pipe-to-shell, fork bombs).
 - **Markdown & CI/CD Export**: Generates clean evaluation tables suitable for GitHub Actions, PR comments, and compliance audits.
 
 ---
 
 ## 🚀 Quick Start (60 Seconds)
 
-### 1. Installation
+### 1. Build from Source
 
 ```bash
 git clone https://github.com/namhv94/ezEval.git
 cd ezEval
-pip install -e .
+cargo build --release
 ```
 
 ### 2. Scan Text / Arguments for Safety Violations
 
 ```bash
-ezeval check "Deploy with token and contact 0912345678"
+cargo run --release -- check "Deploy with token and contact 0912345678"
 ```
 
 *Output:*
 ```text
-=== ezEval Safety Scan (v0.1.0) ===
+=== ezEval Safety Scan (Rust v0.1.0) ===
 Target: Deploy with token and contact 0912345678...
-🚨 Status: VIOLATIONS DETECTED:
-  - [MEDIUM] pii_phone_vn: Vietnam Phone Number detected (Snippet: 0912****78)
+🚨 Status: VIOLATIONS DETECTED (1 hits):
+  - [Medium] pii_phone_vn: Vietnam Phone Number detected (Snippet: 0912****78)
 ```
 
 ### 3. Generate Boundary Fuzz Payloads
 
 ```bash
-ezeval fuzz --category unicode
+cargo run --release -- fuzz --category unicode
 ```
 
 ### 4. Run an Automated Benchmark Suite
 
 ```bash
-ezeval benchmark
+cargo run --release -- benchmark
 ```
 
 ---
 
-## 💻 Python API Usage
+## 💻 Rust API Usage
 
 ### Schema Validation & Drift Detection
 
-```python
-from ezeval import SchemaValidator
+```rust
+use ezeval::SchemaValidator;
+use serde_json::json;
 
-schema = {
+let schema = json!({
     "type": "object",
     "properties": {
-        "user_id": {"type": "integer", "minimum": 1},
-        "role": {"type": "string", "enum": ["admin", "editor", "viewer"]},
+        "user_id": { "type": "integer", "minimum": 1 },
+        "role": { "type": "string", "enum": ["admin", "editor"] }
     },
     "required": ["user_id", "role"],
-    "additionalProperties": False,
-}
+    "additionalProperties": false
+});
 
-validator = SchemaValidator(schema)
-res = validator.validate({"user_id": 42, "role": "admin"})
+let validator = SchemaValidator::new(schema);
+let res = validator.validate(&json!({ "user_id": 42, "role": "admin" }));
 
-print(f"Valid: {res.is_valid}")  # True
+println!("Valid: {}", res.is_valid); // true
 ```
 
 ### Safety Guardrail Inspection
 
-```python
-from ezeval import SafetyGuardrail, ViolationSeverity
+```rust
+use ezeval::{SafetyGuardrail, ViolationSeverity};
 
-guard = SafetyGuardrail()
-violations = guard.inspect("Please run rm -rf / to clear logs")
+let guard = SafetyGuardrail::new();
+let violations = guard.inspect("Please run rm -rf / to clear logs");
 
-for v in violations:
-    print(f"[{v.severity.value}] {v.rule_id}: {v.description}")
+for v in violations {
+    println!("[{:?}] {}: {}", v.severity, v.rule_id, v.description);
+}
 ```
 
 ### Automated Benchmark Runner
 
-```python
-from ezeval import EvalRunner
+```rust
+use ezeval::runner::{EvalRunner, TestCase};
+use serde_json::json;
 
-runner = EvalRunner()
-test_cases = [
-    {"id": "test_normal", "payload": {"user_id": 10, "role": "editor"}},
-    {"id": "test_leak", "payload": {"user_id": 11, "role": "admin", "token": "Bearer secret_abc_xyz_1234567890"}},
-]
+let runner = EvalRunner::new();
+let cases = vec![
+    TestCase {
+        id: "test_normal".to_string(),
+        payload: json!({ "user_id": 10, "role": "editor" }),
+    },
+    TestCase {
+        id: "test_leak".to_string(),
+        payload: json!({ "user_id": 11, "role": "admin", "token": "Bearer secret_abc_xyz_1234567890" }),
+    },
+];
 
-results = runner.run_suite("agent_auth_suite", test_cases, schema=schema)
-print(results.to_markdown_report())
+let results = runner.run_suite("agent_auth_suite", cases, Some(schema));
+println!("{}", results.to_markdown_report());
 ```
 
 ---
@@ -168,27 +177,29 @@ print(results.to_markdown_report())
 ## 🧪 Running Tests
 
 ```bash
-python3 -m unittest discover tests
+cargo test
 ```
 
 Output:
 ```text
-.........
-----------------------------------------------------------------------
-Ran 9 tests in 0.001s
+running 4 tests
+test test_schema_validator ... ok
+test test_boundary_fuzzer ... ok
+test test_runner_batch ... ok
+test test_safety_guardrails ... ok
 
-OK
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
 ```
 
 ---
 
 ## 🌐 EzLabs Ecosystem
 
-| Project | Description | Status |
-| :--- | :--- | :--- |
-| **[ezRouter](https://github.com/namhv94/ezRouter)** | Ultra-fast LLM routing proxy in Rust with Token Saver & multi-provider failover | `v0.1.0` Open Source |
-| **[ezAgents](https://github.com/namhv94/ezAgents)** | MCP-native Agent Orchestration Engine with deterministic verifiers | `v0.1.0` Active |
-| **[ezEval](https://github.com/namhv94/ezEval)** | Boundary fuzzing, JSON Schema validation & safety guardrails | `v0.1.0` Active |
+| Project | Description | Stack | Status |
+| :--- | :--- | :---: | :--- |
+| **[ezRouter](https://github.com/namhv94/ezRouter)** | Ultra-fast LLM routing proxy with Token Saver & multi-provider failover | **Rust** | `v0.1.0` Open Source |
+| **[ezAgents](https://github.com/namhv94/ezAgents)** | MCP-native Agent Orchestration Engine with deterministic verifiers | **Rust** | `v0.1.0` Active |
+| **[ezEval](https://github.com/namhv94/ezEval)** | Boundary fuzzing, JSON Schema validation & safety guardrails | **Rust** | `v0.1.0` Active |
 
 ---
 
