@@ -2,7 +2,7 @@
 name = "ezeval"
 version = "0.1.0"
 edition = "2021"
-authors = ["EzLabs Core Team <contact@ezlabs.tech>"]
+authors = ["EzLabs Core Team <namhv@ezlabs.tech>"]
 description = "High-throughput boundary fuzzing, JSON Schema enforcement, and safety guardrails in Rust."
 license = "MIT"
 repository = "https://github.com/namhv94/ezEval"
