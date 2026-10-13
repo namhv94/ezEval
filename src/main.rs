@@ -47,8 +47,8 @@ fn main() {
             for m in mutations {
                 if category == "all" || m.category == category {
                     let val_str = m.value.to_string();
-                    let preview = if val_str.len() > 40 {
-                        format!("{}...", &val_str[..40])
+                    let preview = if val_str.chars().count() > 40 {
+                        format!("{}...", val_str.chars().take(40).collect::<String>())
                     } else {
                         val_str
                     };
@@ -61,8 +61,8 @@ fn main() {
         Commands::Check { text } => {
             let guard = SafetyGuardrail::new();
             let violations = guard.inspect(&text);
-            let preview = if text.len() > 80 {
-                format!("{}...", &text[..80])
+            let preview = if text.chars().count() > 80 {
+                format!("{}...", text.chars().take(80).collect::<String>())
             } else {
                 text
             };
