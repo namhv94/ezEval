@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Rust 1.80+](https://img.shields.io/badge/rust-1.80%2B-orange.svg)](https://www.rust-lang.org/)
 [![Safety Alignment](https://img.shields.io/badge/Safety-Anthropic%20Aligned-emerald.svg)](https://www.anthropic.com/)
-[![CI / Quality Gate](https://img.shields.io/badge/Clippy%20%26%20Fmt-Passing-emerald.svg)](https://github.com/namhv94/ezEval)
+[![CI](https://github.com/namhv94/ezEval/actions/workflows/ci.yml/badge.svg)](https://github.com/namhv94/ezEval/actions)
 [![Product of EzLabs](https://img.shields.io/badge/Product%20of-EzLabs-0ea5e9.svg)](https://ezlabs.tech)
 
 [**Website**](https://ezlabs.tech) • [**ezRouter**](https://github.com/namhv94/ezRouter) • [**ezAgents**](https://github.com/namhv94/ezAgents) • [**Issues**](https://github.com/namhv94/ezEval/issues)
